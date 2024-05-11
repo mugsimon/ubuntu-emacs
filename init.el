@@ -16,8 +16,8 @@
 ;;(add-to-list 'package-archives
 ;;             '("marmalade" . "http://marmalade-repo.org/packages/"))
 (setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ;; ("melpa-stable" . "https://stable.melpa.org/packages/")
+      '(;;("melpa" . "https://melpa.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("gnu" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
@@ -231,7 +231,7 @@
 (setq-default tab-width 4 indent-tabs-mode nil)
 ;; ウィンドウを透明にする
 ;; アクティブウィンドウ／非アクティブウィンドウ（alphaの値で透明度を指定）
-(add-to-list 'default-frame-alist '(alpha . (0.96 0.93)))
+(add-to-list 'default-frame-alist '(alpha . (0.90 0.85)))
 
 ;; ホイールでスクロールする行数を設定
 (setq mouse-wheel-scroll-amount '(1 ((shift) . 5)))
@@ -263,6 +263,14 @@
 
 ;; ros
 (add-to-list 'load-path "/opt/ros/DISTRO/share/emacs/site-lisp")
+
+;;; シンボルをハイライト
+;;; 1秒後自動ハイライトされるようになる
+(setq highlight-symbol-idle-delay 1.0)
+;;; 自動ハイライト
+(add-hook 'prog-mode-hook 'highlight-symbol-mode)
+;;; ソースコードにおいてM-p/M-nでシンボル間を移動
+(add-hook 'prog-mode-hook 'highlight-symbol-nav-mode)
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;; ubuntu専用設定 ;;;
@@ -303,9 +311,9 @@
  ;; If there is more than one, they won't work right.
  '(blink-cursor-mode nil)
  '(column-number-mode t)
+ '(ispell-dictionary nil)
  '(package-selected-packages
-   (quote
-    (yaml-mode auto-complete-nxml launch-mode ros python python-mode go-mode popup htmlize auto-complete)))
+   '(highlight-symbol yaml-mode auto-complete-nxml launch-mode ros python-mode go-mode popup htmlize auto-complete))
  '(show-paren-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
