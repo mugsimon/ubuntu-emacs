@@ -7,20 +7,17 @@
 	(file-name-as-directory (concat user-emacs-directory "site-lisp"))))
   (add-to-list 'load-path default-directory)
   (normal-top-level-add-subdirs-to-load-path))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ package manager                                               ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 (require 'package)
-;;(add-to-list 'package-archives
-;;             '("melpa" . "http://melpa.milkbox.net/packages/") t)
-;;(add-to-list 'package-archives
-;;             '("marmalade" . "http://marmalade-repo.org/packages/"))
 (setq package-archives
-      '(;;("melpa" . "https://melpa.org/packages/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")
+      '(("melpa-stable" . "https://stable.melpa.org/packages/")
         ("org" . "https://orgmode.org/elpa/")
         ("gnu" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ language - coding system                                      ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -34,6 +31,7 @@
 (set-keyboard-coding-system 'utf-8-unix)
 ;; サブプロセスのデフォルト文字コード
 (setq default-process-coding-system '(undecided-dos . utf-8-unix))
+
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - mode line                                            ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
@@ -52,31 +50,6 @@
 ;; カーソルの点滅
 (blink-cursor-mode 0)
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-;;; @ screen - linum                                                ;;;
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
-(require 'linum)
-;; 行移動を契機に描画
-(defvar linum-line-number 0)
-(declare-function linum-update-current "linum" ())
-(defadvice linum-update-current
-    (around linum-update-current-around activate compile)
-  (unless (= linum-line-number (line-number-at-pos))
-    (setq linum-line-number (line-number-at-pos))
-    ad-do-it
-    ))
-;; バッファ中の行番号表示の遅延設定
-(defvar linum-delay nil)
-(setq linum-delay t)
-(defadvice linum-schedule (around linum-schedule-around () activate)
-  (run-with-idle-timer 1.0 nil #'linum-update-current))
-;; 行番号の書式
-(defvar linum-format nil)
-(setq linum-format "%5d")
-;; バッファ中の行番号表示
-(global-linum-mode t)
-;; 文字サイズ
-(set-face-attribute 'linum nil :height 0.75)
-;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;; @ screen - hiwin                                                ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;;(require 'hiwin)
@@ -86,7 +59,7 @@
 ;;; @ search - isearch                                              ;;;
 ;;; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ;;;
 ;; 大文字・小文字を区別しないでサーチ
-(setq-default case-fold-search nil)
+(setq-default case-fold-search nil)     
 ;; インクリメント検索時に縦スクロールを有効化
 (setq isearch-allow-scroll nil)
 ;; C-dで検索文字列を一文字削除
@@ -201,17 +174,20 @@
 ;;;;;;;;;;;;;;;;
 ;; disable startup message
 (setq inhibit-startup-message t)
+
 ;; disable beep
 (setq ring-bell-function 'ignore)
-;;Altキーをmetaキーとして使う
-(setq w32-alt-is-meta t)
+
 ;; カッコの対応をわかりやすく表示する
 (show-paren-mode t)
+
 ;; theme setting
 (load-theme 'wombat t)
+
 ;; auto-save-buffers
-(require 'auto-save-buffers)
-(run-with-idle-timer 0.5 t 'auto-save-buffers)
+;(require 'auto-save-buffers)
+;(run-with-idle-timer 0.5 t 'auto-save-buffers)
+
 ;; auto complete
 (require 'auto-complete-config)
 (ac-config-default)
@@ -222,13 +198,17 @@
 (ac-set-trigger-key "TAB")
 (setq ac-use-menu-map t)
 (setq ac-use-fuzzy t)
+
 ;; pairence
 (global-set-key (kbd "\"") 'skeleton-pair-insert-maybe)
 (setq skeleton-pair 1)
+
 ;; auto reload
 (global-auto-revert-mode t)
+
 ;; タブにスペースを使用する
 (setq-default tab-width 4 indent-tabs-mode nil)
+
 ;; ウィンドウを透明にする
 ;; アクティブウィンドウ／非アクティブウィンドウ（alphaの値で透明度を指定）
 (add-to-list 'default-frame-alist '(alpha . (0.90 0.85)))
@@ -266,11 +246,27 @@
 
 ;;; シンボルをハイライト
 ;;; 1秒後自動ハイライトされるようになる
-(setq highlight-symbol-idle-delay 1.0)
+(setq highlight-symbol-idle-delay 0.5)
 ;;; 自動ハイライト
 (add-hook 'prog-mode-hook 'highlight-symbol-mode)
 ;;; ソースコードにおいてM-p/M-nでシンボル間を移動
 (add-hook 'prog-mode-hook 'highlight-symbol-nav-mode)
+
+;; tab bar mode
+(tab-bar-mode 1)
+
+;; undo-tree
+(require 'undo-tree)
+(global-undo-tree-mode t)
+
+;; 行番号を表示(linumから乗り換え)
+(if (version<= "26.0.50" emacs-version)
+    (global-display-line-numbers-mode))
+(setq display-line-numbers-width-start t)
+(setq display-line-numbers-width 4)
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;; ubuntu専用設定 ;;;
@@ -290,9 +286,9 @@
 (set-fontset-font t 'japanese-jisx0208 "Migu 1M")
 
 ;; フォントサイズ調整
-(global-set-key (kbd "C-<mouse-6>")   '(lambda() (interactive) (text-scale-increase 1)))
+(global-set-key (kbd "C-<mouse-6>")    '(lambda() (interactive) (text-scale-increase 1)))
 (global-set-key (kbd "C-=")            '(lambda() (interactive) (text-scale-increase 1)))
-(global-set-key (kbd "C-<mouse-7>") '(lambda() (interactive) (text-scale-decrease 1)))
+(global-set-key (kbd "C-<mouse-7>")    '(lambda() (interactive) (text-scale-decrease 1)))
 (global-set-key (kbd "C--")            '(lambda() (interactive) (text-scale-decrease 1)))
 ;; フォントサイズ リセット
 (global-set-key (kbd "M-0") '(lambda() (interactive) (text-scale-set 0)))
@@ -303,7 +299,6 @@
 (global-set-key (kbd "S-<mouse-6>") 'ignore)
 (global-set-key (kbd "S-<mouse-7>") 'ignore)
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -313,7 +308,7 @@
  '(column-number-mode t)
  '(ispell-dictionary nil)
  '(package-selected-packages
-   '(highlight-symbol yaml-mode auto-complete-nxml launch-mode ros python-mode go-mode popup htmlize auto-complete))
+   '(undo-tree markdown-mode highlight-symbol yaml-mode auto-complete-nxml launch-mode ros python-mode go-mode popup htmlize auto-complete))
  '(show-paren-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
